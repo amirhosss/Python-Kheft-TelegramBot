@@ -10,20 +10,20 @@ from telebot.types import (
 from kheft.config import configs
 from kheft.bot.languages.reader import fa_lang
 from kheft.bot.states import Advertisement
+from kheft.bot.handlers.utils import normalize_from_en
 
 
 async def default_greeting(msg: Message, bot: AsyncTeleBot):
-    fa_msg = fa_lang["commands"]["start"]["default"]
+    fa_msg = fa_lang["messages"]["nonMember"]
 
     markup = InlineKeyboardMarkup()
-    for btn, data in zip(fa_msg["buttons"], fa_msg["callbackData"]):
+    for btn, data in zip(fa_msg["btns"], fa_msg["failed"]):
         markup.add(InlineKeyboardButton(text=btn, callback_data=data))
 
     await bot.reply_to(
         msg,
-        "\n".join(fa_msg["texts"]["start"]).format(
+        "\n".join(fa_msg["response"]).format(
             userId=msg.chat.id,
-            name=msg.chat.first_name,
             channelId=configs.telegrambot_public_channel,
         ),
         parse_mode="MARKDOWN",
@@ -32,28 +32,30 @@ async def default_greeting(msg: Message, bot: AsyncTeleBot):
 
 
 async def already_membership_greeting(msg: Message, bot: AsyncTeleBot):
-    fa_msg = fa_lang["commands"]["start"]["alreadyMembership"]
+    fa_msg = fa_lang["messages"]["member"]
 
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
-    for btn in fa_msg["buttons"]:
+    for btn in fa_msg["btns"]:
         markup.add(KeyboardButton(text=btn))
 
-    await bot.send_message(msg.chat.id, "\n".join(fa_msg["texts"]), reply_markup=markup)
+    await bot.send_message(
+        msg.chat.id, "\n".join(fa_msg["response"]), reply_markup=markup
+    )
 
 
 async def advertise_registration(msg: Message, bot: AsyncTeleBot):
-    fa_msg = fa_lang["advertiseRegistration"]
+    fa_msg = fa_lang["conversations"]["userRegistration"]
 
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    for btn in fa_msg["buttons"]:
+    for btn in fa_msg["btns"]:
         markup.add(KeyboardButton(text=btn))
 
     await bot.set_state(msg.from_user.id, Advertisement.rules)
     await bot.send_message(
         msg.chat.id,
         ("\n" * 2)
-        .join(fa_msg["responses"])
-        .format(advertisePrice=configs.advertise_price),
+        .join(fa_msg["response"])
+        .format(advertisePrice=normalize_from_en(configs.advertise_price)),
         reply_markup=markup,
     )
 

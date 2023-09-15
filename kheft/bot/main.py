@@ -27,25 +27,11 @@ bot.add_custom_filter(IsDigitFilter())
 # My custom filter
 bot.add_custom_filter(IsMember(bot))
 
-messages = fa_lang["messages"]
-bot.register_message_handler(
-    callback=message_handlers.default_greeting,
-    commands=messages["nonMember"]["response"],
-    pass_bot=True,
-    is_member=False,
-)
-
-bot.register_message_handler(
-    callback=message_handlers.already_membership_greeting,
-    commands=messages["member"]["response"],
-    pass_bot=True,
-    is_member=True,
-)
 
 conversations = fa_lang["conversations"]
 bot.register_message_handler(
     callback=message_handlers.advertise_registration,
-    text=conversations["userRegistrations"]["response"],
+    text=conversations["userRegistration"]["query"],
     pass_bot=True,
     is_member=True,
 )
@@ -87,6 +73,19 @@ bot.register_callback_query_handler(
     pass_bot=True,
     func=lambda call: call.message.text
     == fa_lang["commands"]["start"]["default"]["callbackData"][0],
+)
+
+messages = fa_lang["messages"]
+bot.register_message_handler(
+    callback=message_handlers.default_greeting,
+    pass_bot=True,
+    is_member=False,
+)
+
+bot.register_message_handler(
+    callback=message_handlers.already_membership_greeting,
+    pass_bot=True,
+    is_member=True,
 )
 
 
