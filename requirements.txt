@@ -1,0 +1,2 @@
+pyTelegramBotAPI==4.13.0
+pydantic_core==2.6.3
