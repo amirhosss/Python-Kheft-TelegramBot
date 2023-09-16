@@ -9,7 +9,7 @@ from telebot.asyncio_filters import (
     IsDigitFilter,
 )
 from kheft.config import configs
-from kheft.bot.handlers import message_handlers, callback_handlers
+from kheft.bot.handlers import callback_handlers, message
 from kheft.bot.states import Advertisement
 from kheft.bot.custom_filters import IsMember
 from kheft.bot.languages.reader import fa_lang
@@ -30,43 +30,39 @@ bot.add_custom_filter(IsMember(bot))
 
 conversations = fa_lang["conversations"]
 bot.register_message_handler(
-    callback=message_handlers.advertise_registration,
+    callback=message.user_registration,
     text=conversations["userRegistration"]["query"],
     pass_bot=True,
     is_member=True,
 )
 
 bot.register_message_handler(
-    callback=message_handlers.rules_acceptance,
-    text=conversations["userRules"]["response"],
+    callback=message.rules_acceptance,
+    state=Advertisement.registration,
+    pass_bot=True,
+    is_member=True,
+)
+
+bot.register_message_handler(
+    callback=message.get_telegram_id,
     state=Advertisement.rules,
     pass_bot=True,
     is_member=True,
 )
 
 bot.register_message_handler(
-    callback=message_handlers.get_description,
-    state=Advertisement.description,
+    callback=message.get_book_description,
+    state=Advertisement.user_telegram_id,
     pass_bot=True,
     is_member=True,
 )
 
 bot.register_message_handler(
-    callback=message_handlers.get_telegram_id,
-    text_startswith="@",
-    state=Advertisement.telegram_id,
+    callback=message.get_book_price,
+    state=Advertisement.book_description,
     pass_bot=True,
     is_member=True,
 )
-
-bot.register_message_handler(
-    callback=message_handlers.get_price,
-    state=Advertisement.price,
-    pass_bot=True,
-    is_member=True,
-    is_digit=True,
-)
-
 
 bot.register_callback_query_handler(
     callback_handlers.default_starting_callback,
@@ -77,13 +73,13 @@ bot.register_callback_query_handler(
 
 messages = fa_lang["messages"]
 bot.register_message_handler(
-    callback=message_handlers.default_greeting,
+    callback=message.non_member_greeting,
     pass_bot=True,
     is_member=False,
 )
 
 bot.register_message_handler(
-    callback=message_handlers.already_membership_greeting,
+    callback=message.member_greeting,
     pass_bot=True,
     is_member=True,
 )
