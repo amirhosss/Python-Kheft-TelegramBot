@@ -1,3 +1,5 @@
+import asyncio
+
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import (
     Message,
@@ -17,15 +19,14 @@ async def non_member_greeting(msg: Message, bot: AsyncTeleBot):
 
     markup = InlineKeyboardMarkup()
     for btn, data in zip(fa_msg["btns"], fa_msg["failed"]):
-        markup.add(InlineKeyboardButton(text=btn, callback_data=data))
+        markup.add(InlineKeyboardButton(text=btn, callback_data="ok"))
 
     await bot.reply_to(
         msg,
         "\n".join(fa_msg["response"]).format(
-            userId=msg.chat.id,
+            firstName=msg.chat.first_name,
             channelId=configs.telegrambot_public_channel,
         ),
-        parse_mode="MARKDOWN",
         reply_markup=markup,
     )
 
@@ -106,11 +107,25 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
         upper_limit = configs.book_price_limit[1]
 
         if lower_limit <= price <= upper_limit:
-            await bot.send_message(
-                msg.chat.id, "\n".join(fa_msg["bookAdvertise"]["response"]).format()
+            current_msg = await bot.send_message(
+                msg.chat.id, "\n".join(fa_msg["bookAdvertise"]["waiting"])
             )
+            user_data = {}
             async with bot.retrieve_data(msg.chat.id) as data:
                 data["book_price"] = price
+                user_data = data
+            await asyncio.sleep(1)
+            await bot.delete_message(msg.chat.id, current_msg.id)
+            await bot.send_message(
+                msg.chat.id,
+                "\n".join(fa_msg["bookAdvertise"]["response"]).format(
+                    name=msg.chat.first_name,
+                    description=user_data["book_description"],
+                    username=user_data["user_telegram_id"],
+                    price=normalize_from_en(user_data["book_price"]),
+                ),
+            )
+
             await bot.delete_state(msg.chat.id)
         else:
             await bot.reply_to(
