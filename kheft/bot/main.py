@@ -9,7 +9,7 @@ from telebot.asyncio_filters import (
     IsDigitFilter,
 )
 from kheft.config import configs
-from kheft.bot.handlers import callback_handlers, message
+from kheft.bot.handlers import callback, message
 from kheft.bot.states import Advertisement
 from kheft.bot.custom_filters import IsMember
 from kheft.bot.languages.reader import fa_lang
@@ -64,12 +64,6 @@ bot.register_message_handler(
     is_member=True,
 )
 
-bot.register_callback_query_handler(
-    callback_handlers.default_starting_callback,
-    pass_bot=True,
-    func=lambda call: call.message.text
-    == fa_lang["commands"]["start"]["default"]["callbackData"][0],
-)
 
 messages = fa_lang["messages"]
 bot.register_message_handler(
@@ -82,6 +76,12 @@ bot.register_message_handler(
     callback=message.member_greeting,
     pass_bot=True,
     is_member=True,
+)
+
+bot.register_callback_query_handler(
+    callback.default_starting_callback,
+    pass_bot=True,
+    func=lambda call: call.data == "ok",
 )
 
 
