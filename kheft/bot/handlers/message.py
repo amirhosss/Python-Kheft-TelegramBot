@@ -76,16 +76,23 @@ async def get_telegram_id(msg: Message, bot: AsyncTeleBot):
     fa_msg = fa_lang["conversations"]
 
     if msg.text.startswith("@"):
-        await bot.send_message(
-            msg.chat.id,
-            "\n".join(fa_msg["bookDescription"]["response"]),
-            parse_mode="markdown",
-        )
+        await bot.send_message(msg.chat.id, "\n".join(fa_msg["bookName"]["response"]))
         await bot.set_state(msg.chat.id, Advertisement.user_telegram_id)
         async with bot.retrieve_data(msg.chat.id) as data:
             data["user_telegram_id"] = msg.text
     else:
         await bot.reply_to(msg, fa_msg["userTelegramId"]["failed"])
+
+
+async def get_book_name(msg: Message, bot: AsyncTeleBot):
+    fa_msg = fa_lang["conversations"]
+
+    await bot.send_message(
+        msg.chat.id, "\n".join(fa_msg["bookDescription"]["response"])
+    )
+    await bot.set_state(msg.chat.id, Advertisement.book_name)
+    async with bot.retrieve_data(msg.chat.id) as data:
+        data["book_name"] = msg.text
 
 
 async def get_book_description(msg: Message, bot: AsyncTeleBot):
@@ -120,6 +127,7 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
                 msg.chat.id,
                 "\n".join(fa_msg["bookAdvertise"]["response"]).format(
                     name=msg.chat.first_name,
+                    bookName=user_data["book_name"],
                     description=user_data["book_description"],
                     username=user_data["user_telegram_id"],
                     price=normalize_from_en(user_data["book_price"]),

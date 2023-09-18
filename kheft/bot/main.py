@@ -51,8 +51,15 @@ bot.register_message_handler(
 )
 
 bot.register_message_handler(
-    callback=message.get_book_description,
+    callback=message.get_book_name,
     state=Advertisement.user_telegram_id,
+    pass_bot=True,
+    is_member=True,
+)
+
+bot.register_message_handler(
+    callback=message.get_book_description,
+    state=Advertisement.book_name,
     pass_bot=True,
     is_member=True,
 )
