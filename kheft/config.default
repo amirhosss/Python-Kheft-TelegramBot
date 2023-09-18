@@ -12,6 +12,8 @@ class Configs(BaseSettings):
 
     advertise_price: int
 
+    book_price_limit: list = []
+
     class Config:
         case_sensitive = False
 
