@@ -43,6 +43,11 @@ async def member_greeting(msg: Message, bot: AsyncTeleBot):
     )
 
 
+async def cancel_conversation(msg: Message, bot: AsyncTeleBot):
+    await bot.delete_state(msg.chat.id)
+    await member_greeting(msg, bot)
+
+
 async def user_registration(msg: Message, bot: AsyncTeleBot):
     fa_msg = fa_lang["conversations"]["userRegistration"]
 

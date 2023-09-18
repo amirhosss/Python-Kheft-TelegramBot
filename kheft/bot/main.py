@@ -30,6 +30,13 @@ bot.add_custom_filter(IsMember(bot))
 
 conversations = fa_lang["conversations"]
 bot.register_message_handler(
+    callback=message.cancel_conversation,
+    commands="cancel",
+    pass_bot=True,
+    is_member=True,
+)
+
+bot.register_message_handler(
     callback=message.user_registration,
     text=conversations["userRegistration"]["query"],
     pass_bot=True,
