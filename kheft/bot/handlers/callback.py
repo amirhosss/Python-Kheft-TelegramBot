@@ -9,6 +9,7 @@ from kheft.bot.handlers import message
 from kheft.bot.custom_filters import IsMember
 from kheft.bot.languages.reader import fa_lang
 
+from kheft.bot.handlers.utils import normalize_from_en
 from kheft.config import configs
 
 
@@ -70,6 +71,6 @@ async def admin_confirm_reject(call: CallbackQuery, bot: AsyncTeleBot):
                                 bookName=data["book_name"],
                                 description=data["book_description"],
                                 username=data["user_telegram_id"],
-                                price=data["book_price"],
+                                price=normalize_from_en(data["book_price"]),
                             ),
                         )

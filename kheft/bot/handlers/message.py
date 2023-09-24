@@ -58,9 +58,7 @@ async def user_registration(msg: Message, bot: AsyncTeleBot):
     await bot.set_state(msg.from_user.id, Advertisement.registration)
     await bot.send_message(
         msg.chat.id,
-        ("\n" * 2)
-        .join(fa_msg["response"])
-        .format(advertisePrice=normalize_from_en(configs.advertise_price)),
+        ("\n" * 2).join(fa_msg["response"]),
         reply_markup=markup,
     )
 
