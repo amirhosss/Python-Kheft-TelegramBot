@@ -7,6 +7,7 @@ from telebot.types import (
     InlineKeyboardMarkup,
     ReplyKeyboardMarkup,
 )
+
 from kheft.config import configs
 from kheft.bot.languages.reader import fa_lang
 from kheft.bot.states import Advertisement
@@ -148,8 +149,9 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
                             },
                         },
                     )
+                    book_id = res.json()["message"]
                     async with bot.retrieve_data(msg.chat.id) as data:
-                        data["book_id"] = res.json()["message"]
+                        data["book_id"] = book_id
 
                 except Exception as e:
                     print(
@@ -171,14 +173,19 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
             )
 
             markup = InlineKeyboardMarkup()
-            markup.add(InlineKeyboardButton(text="Confirm ✅", callback_data="confirm"))
-            markup.add(InlineKeyboardButton(text="Reject ❌", callback_data="reject"))
+            markup.add(
+                InlineKeyboardButton(
+                    text="Confirm ✅", callback_data=f"confirm,{book_id}"
+                )
+            )
+            markup.add(
+                InlineKeyboardButton(text="Reject ❌", callback_data=f"reject,{book_id}")
+            )
 
             await bot.send_message(
                 configs.telegrambot_private_group, sent_msg.text, reply_markup=markup
             )
 
-            await bot.delete_state(msg.chat.id)
         else:
             await bot.reply_to(
                 msg,
