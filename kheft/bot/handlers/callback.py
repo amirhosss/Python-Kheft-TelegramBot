@@ -29,10 +29,11 @@ async def admin_confirm_reject(call: CallbackQuery, bot: AsyncTeleBot):
 
     if status in ["reject", "confirm"]:
         async with httpx.AsyncClient(
+            http2=True,
             proxies={
                 "http://": configs.telegrambot_proxy,
                 "https://": configs.telegrambot_proxy,
-            }
+            },
         ) as client:
             try:
                 res = await client.patch(

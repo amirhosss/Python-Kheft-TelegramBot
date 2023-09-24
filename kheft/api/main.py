@@ -1,15 +1,18 @@
 import logging
+from typing import Annotated, Union
 
-import fastapi
 import uvicorn
 import telebot.async_telebot as aiotelebot
+from telebot.types import Update
+from fastapi import FastAPI, Response, Header, status
 
+from kheft.bot.app import bot
 from kheft.config import configs
-
-API_TOKEN = configs.telegrambot_token
 
 WEBHOOK_LISTEN = "0.0.0.0"
 WEBHOOK_PORT = configs.webhook_port
+
+WEBHOOK_SECRET_TOKEN = configs.telegrambot_secret_roken
 
 WEBHOOK_URL = configs.webhook_url
 WEBHOOK_URL_PATH = "/{}/".format(configs.telegrambot_token)
@@ -17,21 +20,24 @@ WEBHOOK_URL_PATH = "/{}/".format(configs.telegrambot_token)
 logger = aiotelebot.logger
 aiotelebot.logger.setLevel(logging.INFO)
 
-bot = aiotelebot.AsyncTeleBot(API_TOKEN, state_storage=aiotelebot.StateMemoryStorage())
 
-app = fastapi.FastAPI(docs=None, redoc_url=None)
+app = FastAPI(docs=None, redoc_url=None)
 
 
-@app.post(f"/{API_TOKEN}/")
-async def process_webhook(update: dict):
+@app.post("/")
+async def process_webhook(
+    update: dict,
+    response: Response,
+    x_telegram_bot_api_secret_token: Annotated[Union[str, None], Header()] = None,
+):
     """
     Process webhook calls
     """
-    if update:
-        update = aiotelebot.types.Update.de_json(update)
-        await bot.process_new_updates([update])
-    else:
-        return
+    if x_telegram_bot_api_secret_token != WEBHOOK_SECRET_TOKEN:
+        response.status_code = status.HTTP_403_FORBIDDEN
+        return {"message": "Forbidden"}
+
+    await bot.process_new_updates([Update.de_json(update)])
 
 
 # Remove webhook, it fails sometimes the set if there is a previous webhook
@@ -43,7 +49,9 @@ async def startup() -> None:
         logger.debug(
             f"updating webhook url, old: {webhook_info.url}, new: {WEBHOOK_URL}"
         )
-        if not await bot.set_webhook(url=WEBHOOK_URL, secret_token=API_TOKEN):
+        if not await bot.set_webhook(
+            url=WEBHOOK_URL, secret_token=WEBHOOK_SECRET_TOKEN
+        ):
             raise RuntimeError("unable to set webhook")
 
 
