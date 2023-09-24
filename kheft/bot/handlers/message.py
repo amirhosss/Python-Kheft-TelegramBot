@@ -135,7 +135,7 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
                 try:
                     res = await client.post(
                         configs.backend_url + "/Book/Add",
-                        headers={"X-Api-Key": configs.api_key},
+                        headers={"X-Api-Key": configs.backend_api_key},
                         json={
                             "bookName": user_data["book_name"],
                             "price": user_data["book_price"],

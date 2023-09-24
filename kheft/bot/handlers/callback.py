@@ -37,7 +37,7 @@ async def admin_confirm_reject(call: CallbackQuery, bot: AsyncTeleBot):
             try:
                 res = await client.patch(
                     configs.backend_url + "/Book/Accept",
-                    headers={"X-Api-Key": configs.api_key},
+                    headers={"X-Api-Key": configs.backend_api_key},
                     json={
                         "bookId": book_id,
                         "isAccepted": True if status == "confirm" else False,
