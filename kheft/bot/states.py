@@ -8,3 +8,4 @@ class Advertisement(StatesGroup):
     book_name = State()
     book_description = State()
     book_price = State()
+    book_id = State()

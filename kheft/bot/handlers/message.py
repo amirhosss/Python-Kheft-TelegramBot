@@ -1,5 +1,4 @@
-import asyncio
-
+import httpx
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import (
     Message,
@@ -126,7 +125,35 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
             async with bot.retrieve_data(msg.chat.id) as data:
                 data["book_price"] = price
                 user_data = data
-            await asyncio.sleep(1)
+
+            async with httpx.AsyncClient(
+                http2=True,
+                proxies={
+                    "http://": configs.telegrambot_proxy,
+                    "https://": configs.telegrambot_proxy,
+                },
+            ) as client:
+                try:
+                    res = await client.post(
+                        configs.backend_url + "/Book/Add",
+                        headers={"X-Api-Key": configs.api_key},
+                        json={
+                            "bookName": user_data["book_name"],
+                            "price": user_data["book_price"],
+                            "description": user_data["book_description"],
+                            "bookOwner": {
+                                "telegramUsername": user_data["user_telegram_id"],
+                                "fullName": msg.chat.first_name,
+                                "telegramSerialId": msg.chat.id,
+                            },
+                        },
+                    )
+                    async with bot.retrieve_data(msg.chat.id) as data:
+                        data["book_id"] = res.json()["message"]
+
+                except Exception as e:
+                    print(f"an error caused by: {e}")
+
             await bot.delete_message(msg.chat.id, current_msg.id)
             await bot.send_message(
                 msg.chat.id,

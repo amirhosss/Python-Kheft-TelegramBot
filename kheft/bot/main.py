@@ -99,4 +99,4 @@ bot.register_callback_query_handler(
 )
 
 
-asyncio.run(bot.polling())
+asyncio.run(bot.polling(skip_pending=True))
