@@ -98,5 +98,9 @@ bot.register_callback_query_handler(
     func=lambda call: call.data == "ok",
 )
 
+bot.register_callback_query_handler(
+    callback.admin_confirm_reject, pass_bot=True, func=lambda call: True
+)
+
 
 asyncio.run(bot.polling(skip_pending=True))
