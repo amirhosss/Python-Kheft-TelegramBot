@@ -152,10 +152,13 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
                         data["book_id"] = res.json()["message"]
 
                 except Exception as e:
-                    print(f"an error caused by: {e}")
+                    print(
+                        f"an error occurred when using httpx to request the api by: {e}"
+                    )
+                    return
 
             await bot.delete_message(msg.chat.id, current_msg.id)
-            await bot.send_message(
+            sent_msg = await bot.send_message(
                 msg.chat.id,
                 "\n".join(fa_msg["bookAdvertise"]["response"]).format(
                     name=msg.chat.first_name,
@@ -163,7 +166,16 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
                     description=user_data["book_description"],
                     username=user_data["user_telegram_id"],
                     price=normalize_from_en(user_data["book_price"]),
+                    channelId=configs.telegrambot_public_channel,
                 ),
+            )
+
+            markup = InlineKeyboardMarkup()
+            markup.add(InlineKeyboardButton(text="Confirm ✅", callback_data="confirm"))
+            markup.add(InlineKeyboardButton(text="Reject ❌", callback_data="reject"))
+
+            await bot.send_message(
+                configs.telegrambot_private_group, sent_msg.text, reply_markup=markup
             )
 
             await bot.delete_state(msg.chat.id)
