@@ -74,3 +74,4 @@ async def admin_confirm_reject(call: CallbackQuery, bot: AsyncTeleBot):
                                 price=normalize_from_en(data["book_price"]),
                             ),
                         )
+                    await bot.delete_state(call.from_user.id)

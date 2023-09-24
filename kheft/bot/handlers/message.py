@@ -155,6 +155,7 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
                     print(
                         f"an error occurred when using httpx to request the api by: {e}"
                     )
+                    await bot.delete_state(msg.chat.id)
                     return
 
             await bot.delete_message(msg.chat.id, current_msg.id)
