@@ -1,13 +1,12 @@
-import asyncio
-
-from telebot.asyncio_storage import StateMemoryStorage
-from telebot.async_telebot import AsyncTeleBot, asyncio_helper
+from telebot.async_telebot import asyncio_helper
 from telebot.asyncio_filters import (
     TextMatchFilter,
     TextStartsFilter,
     StateFilter,
     IsDigitFilter,
 )
+
+from kheft.api.main import bot
 from kheft.config import configs
 from kheft.bot.handlers import callback, message
 from kheft.bot.states import Advertisement
@@ -17,7 +16,6 @@ from kheft.bot.languages.reader import fa_lang
 if configs.environment == "test":
     asyncio_helper.proxy = configs.telegrambot_proxy
 
-bot = AsyncTeleBot(token=configs.telegrambot_token, state_storage=StateMemoryStorage())
 
 bot.add_custom_filter(StateFilter(bot))
 bot.add_custom_filter(TextMatchFilter())
@@ -101,6 +99,3 @@ bot.register_callback_query_handler(
 bot.register_callback_query_handler(
     callback.admin_confirm_reject, pass_bot=True, func=lambda call: True
 )
-
-
-asyncio.run(bot.polling(skip_pending=True))
