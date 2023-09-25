@@ -2,17 +2,21 @@ from pydantic_settings import BaseSettings
 
 
 class Configs(BaseSettings):
-    environment: str = "test" # 'test' or 'production'
+    environment: str = "test"  # 'test' or 'production'
 
-    api_key: str
+    webhook_url: str
+    webhook_port: int
 
-    telegrambot_token: str 
+    backend_api_key: str
+    backend_url: str
+
+    telegrambot_token: str
+    telegrambot_secret_roken: str
     telegrambot_proxy: str
     telegrambot_public_channel: str
+    telegrambot_private_group: int
 
-    advertise_price: int
-
-    book_price_limit: list = []
+    book_price_limit: list
 
     class Config:
         case_sensitive = False
