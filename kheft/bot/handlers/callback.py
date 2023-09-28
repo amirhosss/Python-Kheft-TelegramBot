@@ -58,11 +58,13 @@ async def admin_confirm_reject(call: CallbackQuery, bot: AsyncTeleBot):
                     async with bot.retrieve_data(call.from_user.id) as data:
                         await bot.send_message(
                             configs.telegrambot_public_channel,
-                            text="\n".join(
+                            text=(2 * "\n")
+                            .join(
                                 fa_lang["conversations"]["publicBookAdvertise"][
                                     "response"
                                 ]
-                            ).format(
+                            )
+                            .format(
                                 bookName=data["book_name"],
                                 description=data["book_description"],
                                 username=data["user_telegram_id"],
