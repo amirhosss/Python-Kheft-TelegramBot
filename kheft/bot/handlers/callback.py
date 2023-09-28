@@ -10,7 +10,7 @@ from kheft.bot.custom_filters import IsMember
 from kheft.bot.languages.reader import fa_lang
 
 from kheft.bot.handlers.utils import normalize_from_en
-from kheft.config import configs
+from kheft.config_local import configs
 
 
 async def default_starting_callback(call: CallbackQuery, bot: AsyncTeleBot):
