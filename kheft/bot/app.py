@@ -1,7 +1,6 @@
 from telebot.async_telebot import (
     AsyncTeleBot,
     StateMemoryStorage,
-    asyncio_helper,
 )
 from telebot.asyncio_filters import (
     TextMatchFilter,
@@ -16,8 +15,6 @@ from kheft.bot.states import Advertisement
 from kheft.bot.custom_filters import IsMember
 from kheft.bot.languages.reader import fa_lang
 
-if configs.environment == "test":
-    asyncio_helper.proxy = configs.telegrambot_proxy
 
 bot = AsyncTeleBot(configs.telegrambot_token, state_storage=StateMemoryStorage())
 

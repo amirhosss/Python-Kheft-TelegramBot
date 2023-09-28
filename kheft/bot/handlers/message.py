@@ -125,13 +125,7 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
                 data["book_price"] = price
                 user_data = data
 
-            async with httpx.AsyncClient(
-                http2=True,
-                proxies={
-                    "http://": configs.telegrambot_proxy,
-                    "https://": configs.telegrambot_proxy,
-                },
-            ) as client:
+            async with httpx.AsyncClient(http2=True) as client:
                 try:
                     res = await client.post(
                         configs.backend_url + "/Book/Add",
