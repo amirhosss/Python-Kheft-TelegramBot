@@ -43,32 +43,27 @@ async def admin_confirm_reject(call: CallbackQuery, bot: AsyncTeleBot):
                 print(f"an error occurred when sending book acceptance {e}")
                 return
 
-            if res.status_code == 200:
-                await bot.answer_callback_query(
-                    call.id,
-                    text="Accepted ✅" if status == "confirm" else "Rejected ❌",
-                    show_alert=True,
+            await bot.answer_callback_query(
+                call.id,
+                text="Accepted ✅" if status == "confirm" else "Rejected ❌",
+                show_alert=True,
+            )
+            await bot.edit_message_reply_markup(
+                configs.telegrambot_private_group,
+                call.message.id,
+                reply_markup=None,
+            )
+            if status == "confirm":
+                data = res.json()["message"]
+
+                await bot.send_message(
+                    configs.telegrambot_public_channel,
+                    text=(2 * "\n")
+                    .join(fa_lang["conversations"]["publicBookAdvertise"]["response"])
+                    .format(
+                        bookName=data["book"]["name"],
+                        description=data["book"]["description"],
+                        username=data["bookOwner"]["telegramUsername"],
+                        price=normalize_from_en(data["book"]["price"]),
+                    ),
                 )
-                await bot.edit_message_reply_markup(
-                    configs.telegrambot_private_group,
-                    call.message.id,
-                    reply_markup=None,
-                )
-                if status == "confirm":
-                    async with bot.retrieve_data(call.from_user.id) as data:
-                        await bot.send_message(
-                            configs.telegrambot_public_channel,
-                            text=(2 * "\n")
-                            .join(
-                                fa_lang["conversations"]["publicBookAdvertise"][
-                                    "response"
-                                ]
-                            )
-                            .format(
-                                bookName=data["book_name"],
-                                description=data["book_description"],
-                                username=data["user_telegram_id"],
-                                price=normalize_from_en(data["book_price"]),
-                            ),
-                        )
-                    await bot.delete_state(call.from_user.id)

@@ -178,6 +178,7 @@ async def get_book_price(msg: Message, bot: AsyncTeleBot):
             await bot.send_message(
                 configs.telegrambot_private_group, sent_msg.text, reply_markup=markup
             )
+            await bot.delete_state(msg.chat.id)
 
         else:
             await bot.reply_to(
