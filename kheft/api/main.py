@@ -15,7 +15,6 @@ WEBHOOK_PORT = configs.webhook_port
 WEBHOOK_SECRET_TOKEN = configs.telegrambot_secret_roken
 
 WEBHOOK_URL = configs.webhook_url
-WEBHOOK_URL_PATH = "/{}/".format(configs.telegrambot_token)
 
 logger = aiotelebot.logger
 aiotelebot.logger.setLevel(logging.INFO)
@@ -44,15 +43,13 @@ async def process_webhook(
 @app.on_event("startup")
 async def startup() -> None:
     """Register webhook for telegram updates."""
-    webhook_info = await bot.get_webhook_info(30)
-    if WEBHOOK_URL != webhook_info.url:
-        logger.debug(
-            f"updating webhook url, old: {webhook_info.url}, new: {WEBHOOK_URL}"
-        )
-        if not await bot.set_webhook(
-            url=WEBHOOK_URL, secret_token=WEBHOOK_SECRET_TOKEN
-        ):
-            raise RuntimeError("unable to set webhook")
+    await bot.delete_webhook(drop_pending_updates=True)
+
+    logger.debug(f"updating webhook url, new: {WEBHOOK_URL}")
+    if not await bot.set_webhook(
+        url=WEBHOOK_URL, secret_token=WEBHOOK_SECRET_TOKEN, drop_pending_updates=True
+    ):
+        raise RuntimeError("unable to set webhook")
 
 
 uvicorn.run(
